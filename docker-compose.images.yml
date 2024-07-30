@@ -1,12 +1,12 @@
-version: "3.8" # Compatible version for Docker Swarm and Compose Spec
+# version is now using "compose spec"
+# v2 and v3 are now combined!
+# docker-compose v1.27+ required
 
 services:
   vote:
     build: 
       context: ./vote
       target: dev
-    depends_on:
-      - redis
     healthcheck: 
       test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 15s
@@ -14,7 +14,7 @@ services:
       retries: 3
       start_period: 10s
     volumes:
-      - ./vote:/usr/local/app
+     - ./vote:/usr/local/app
     ports:
       - "5000:80"
     networks:
@@ -23,9 +23,8 @@ services:
 
   result:
     build: ./result
+    # use nodemon rather than node for local dev
     entrypoint: nodemon --inspect=0.0.0.0 server.js
-    depends_on:
-      - db
     volumes:
       - ./result:/usr/local/app
     ports:
@@ -38,9 +37,6 @@ services:
   worker:
     build:
       context: ./worker
-    depends_on:
-      - redis
-      - db
     networks:
       - back-tier
 
